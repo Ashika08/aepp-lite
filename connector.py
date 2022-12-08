@@ -9,7 +9,6 @@ class Connect:
 
     def __init__(self):
         self.config_data = config.Config()
-        print(self.config_data.access_token)
 
     def call_api(self):
         get_datasets_endpoint = f'{constants.DATASET_ENDPOINT}/634d2969f84e311c07e7f27d/labels'

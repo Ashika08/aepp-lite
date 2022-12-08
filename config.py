@@ -11,21 +11,19 @@ class Config:
 
     def __init__(self):
         with open('credentials.json', 'r') as config_file:
-            self.config_data = json.load(config_file)
-        self.org_id = self.config_data['credentials']['org_id']
-        self.client_id = self.config_data['credentials']['client_id']
-        self.tech_id = self.config_data['credentials']['tech_id']
-        self.secret = self.config_data['credentials']['secret']
-        self.path_to_key = self.config_data['credentials']['pathToKey']
-        self.sandbox_name = self.config_data['credentials']['sandbox-name']
+            config_data = json.load(config_file)
+        self.org_id = config_data['credentials']['org_id']
+        self.client_id = config_data['credentials']['client_id']
+        self.tech_id = config_data['credentials']['tech_id']
+        self.secret = config_data['credentials']['secret']
+        self.path_to_key = config_data['credentials']['pathToKey']
+        self.sandbox_name = config_data['credentials']['sandbox-name']
         self.encoded_jwt_token = self.get_encoded_jwt_token()
         self.access_token = self.get_access_token()
 
     def get_encoded_jwt_token(self) -> str:
         # token expires after 5 minutes
         expiry_time = datetime.datetime.now() + datetime.timedelta(seconds=300)
-        print(datetime.datetime.now().hour, datetime.datetime.now().minute)
-        print(expiry_time.hour, expiry_time.minute)
 
         private_key_path = self.path_to_key
         with open(private_key_path, 'r') as private_key_file:
