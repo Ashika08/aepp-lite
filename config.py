@@ -10,7 +10,7 @@ import requests
 class Config:
 
     def __init__(self):
-        with open('credentials.json', 'r') as config_file:
+        with open('credentials_template.json', 'r') as config_file:
             config_data = json.load(config_file)
         self.org_id = config_data['credentials']['org_id']
         self.client_id = config_data['credentials']['client_id']
