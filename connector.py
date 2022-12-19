@@ -51,22 +51,31 @@ class Connector:
         if path_variables:
             for path_variables_value in path_variables.values():
                 url = f'{url}/{path_variables_value}'
+        try:
+            if method == Method.GET:
+                request = requests.get(
+                    url=url, headers=default_header, params=query_params)
+            elif method == Method.PUT:
+                request = requests.put(
+                    url=url, headers=default_header, params=query_params, json=body)
+            elif method == Method.POST:
+                request = requests.post(
+                    url=url, headers=default_header, params=query_params, json=body)
+            elif method == Method.PATCH:
+                request = requests.patch(
+                    url=url, headers=default_header, params=query_params, json=body)
+            elif method == Method.DELETE:
+                request = requests.delete(
+                    url=url, headers=default_header, params=query_params, json=body)
+            request.raise_for_status()
 
-        if method == Method.GET:
-            request = requests.get(
-                url=url, headers=default_header, params=query_params)
-        elif method == Method.PUT:
-            request = requests.put(
-                url=url, headers=default_header, params=query_params, json=body)
-        elif method == Method.POST:
-            request = requests.post(
-                url=url, headers=default_header, params=query_params, json=body)
-        elif method == Method.PATCH:
-            request = requests.patch(
-                url=url, headers=default_header, params=query_params, json=body)
-        elif method == Method.DELETE:
-            request = requests.delete(
-                url=url, headers=default_header, params=query_params, json=body)
+        except requests.HTTPError as err_http:
+            raise requests.HTTPError("Http Error:", err_http)
+        except requests.ConnectionError as err_conn:
+            raise requests.ConnectionError("Connection Error:", err_conn)
+        except requests.RequestException as err:
+            raise requests.RequestException(
+                f"Error while trying to access {url}", err)
 
         response = request.json()
         pretty_response = json.dumps(response, indent=4)

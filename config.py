@@ -5,6 +5,7 @@ import datetime
 import json
 import jwt
 import requests
+from pathlib import Path
 
 
 def get_encoded_jwt_token(credentials: dict) -> str:
@@ -12,8 +13,12 @@ def get_encoded_jwt_token(credentials: dict) -> str:
     expiry_time = datetime.datetime.now() + datetime.timedelta(seconds=300)
 
     private_key_path = credentials["path_to_key"]
-    with open(private_key_path, 'r') as private_key_file:
-        private_key = private_key_file.read()
+    private_key_file = Path(private_key_path)
+    if private_key_file.is_file():
+        with open(private_key_path, 'r') as p:
+            private_key = p.read()
+    else:
+        raise FileNotFoundError(f"{private_key_path} does not exist")
 
     jwt_token = {
         "exp": expiry_time,
@@ -35,8 +40,18 @@ def get_access_token(credentials: dict) -> str:
     }
 
     jwt_token_endpoint = constants.JWT_TOKEN_ENDPOINT
-    jwt_token_request = requests.post(
-        url=jwt_token_endpoint, data=access_token_payload)
+    try:
+        jwt_token_request = requests.post(
+            url=jwt_token_endpoint, data=access_token_payload)
+        jwt_token_request.raise_for_status()
+    except requests.HTTPError as err_http:
+        raise requests.HTTPError("Http Error:", err_http)
+    except requests.ConnectionError as err_conn:
+        raise requests.ConnectionError("Connection Error:", err_conn)
+    except requests.RequestException as err:
+        raise requests.RequestException(
+            "Error while trying to access JWT endpoint", err)
+
     jwt_token_response = jwt_token_request.json()
     access_token = jwt_token_response['access_token']
 
