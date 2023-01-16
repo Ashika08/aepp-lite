@@ -39,7 +39,7 @@ def get_access_token(credentials: dict) -> str:
         "jwt_token": credentials["encoded_jwt_token"],
     }
 
-    jwt_token_endpoint = constants.JWT_TOKEN_ENDPOINT
+    jwt_token_endpoint = constants.aep_api_endpoints["jwt_token_endpoint"]
     try:
         jwt_token_request = requests.post(
             url=jwt_token_endpoint, data=access_token_payload)
